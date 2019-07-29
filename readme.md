@@ -80,7 +80,8 @@ exec "select * from help_keyword limit 5" --json
 ```
 
 返回的是一段`json`字符串，如下
-```
+```json
+[
 	{
 		"name":"(JSON",
 		"help_keyword_id":"670"
