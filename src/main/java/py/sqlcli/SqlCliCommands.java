@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -72,6 +73,27 @@ public class SqlCliCommands {
     public String exec(
             @ShellOption() String sql,
             @ShellOption() boolean json) {
+
+        sql = sql.trim();
+        if (StringUtils.startsWithIgnoreCase(sql, "select")) {
+            return execQuery(sql, json);
+        } else {
+            return execUpdate(sql);
+        }
+
+    }
+
+    private String execUpdate(String sql) {
+        try {
+            int rows = stmt.executeUpdate(sql);
+            return "rows: "+rows;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return "error: " + e.getMessage();
+        }
+    }
+
+    private String execQuery(String sql, boolean json) {
         try (ResultSet rs = stmt.executeQuery(sql)) {
             final ResultSetMetaData metaData = rs.getMetaData();
             final int columnCount = metaData.getColumnCount();
