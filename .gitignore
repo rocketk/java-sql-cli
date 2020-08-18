@@ -32,3 +32,5 @@ build/
 
 output*
 *.log
+*.jar
+application.properties

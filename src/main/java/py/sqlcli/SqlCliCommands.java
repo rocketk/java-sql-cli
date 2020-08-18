@@ -2,6 +2,10 @@ package py.sqlcli;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
@@ -10,15 +14,11 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.*;
 
 /**
  * @author pengyu
@@ -72,11 +72,12 @@ public class SqlCliCommands {
     @ShellMethod("execute sql")
     public String exec(
             @ShellOption() String sql,
-            @ShellOption() boolean json) {
+            @ShellOption() boolean json,
+            @ShellOption() boolean excel) {
 
         sql = sql.trim();
         if (StringUtils.startsWithIgnoreCase(sql, "select")) {
-            return execQuery(sql, json);
+            return execQuery(sql, json, excel);
         } else {
             return execUpdate(sql);
         }
@@ -86,14 +87,14 @@ public class SqlCliCommands {
     private String execUpdate(String sql) {
         try {
             int rows = stmt.executeUpdate(sql);
-            return "rows: "+rows;
+            return "rows: " + rows;
         } catch (SQLException e) {
             e.printStackTrace();
             return "error: " + e.getMessage();
         }
     }
 
-    private String execQuery(String sql, boolean json) {
+    private String execQuery(String sql, boolean json, boolean excel) {
         try (ResultSet rs = stmt.executeQuery(sql)) {
             final ResultSetMetaData metaData = rs.getMetaData();
             final int columnCount = metaData.getColumnCount();
@@ -113,6 +114,8 @@ public class SqlCliCommands {
             final String output;
             if (json) {
                 output = createJsonString(columnNames, rows);
+            } else if (excel) {
+                output = createExcelFile(columnNames, rows);
             } else {
                 final Table table = createTable(columnNames, rows);
                 output = table.toString();
@@ -156,7 +159,54 @@ public class SqlCliCommands {
             }
             jsonArray.add(field);
         }
-        return JSONArray.toJSONString(jsonArray, true);
+        return "";
+    }
+
+    private String createExcelFile(String[] columnNames, List<String[]> rows) {
+        final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss_SSS");
+        String filename = sdf.format(new Date());
+        final String pathname = "/tmp/java-sql-cli/";
+        filename = pathname + filename + ".xlsx";
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        XSSFSheet sheet = workbook.createSheet("Result");
+        final XSSFRow firstRow = sheet.createRow(0);
+        // 表头
+        for (int i = 0; i < columnNames.length; i++) {
+            final XSSFCell cell = firstRow.createCell(i);
+            cell.setCellValue(columnNames[i]);
+        }
+
+        for (int i = 0; i < rows.size(); i++) {
+            final XSSFRow row = sheet.createRow(i + 1);
+            for (int j = 0; j < columnNames.length; j++) {
+                final XSSFCell cell = row.createCell(j);
+                cell.setCellValue(rows.get(i)[j]);
+            }
+        }
+        File path = new File(pathname);
+        if (!path.exists()) {
+            final boolean ok = path.mkdirs();
+            if (!ok) {
+                return "Make Directories Error: " + pathname;
+            }
+        }
+        File file = new File(filename);
+        try {
+            final boolean ok = file.createNewFile();
+            if (!ok) {
+                return "Create File Error: " + filename;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "Create File Error: " + filename;
+        }
+        try (FileOutputStream outputStream = new FileOutputStream(file)) {
+            workbook.write(outputStream);
+            return "Written to file: " + filename;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "Write data error: " + filename;
+        }
     }
 
     private void appendFile(String sql, String result) throws IOException {
