@@ -159,7 +159,7 @@ public class SqlCliCommands {
             }
             jsonArray.add(field);
         }
-        return "";
+        return JSONArray.toJSONString(jsonArray, true);
     }
 
     private String createExcelFile(String[] columnNames, List<String[]> rows) {
