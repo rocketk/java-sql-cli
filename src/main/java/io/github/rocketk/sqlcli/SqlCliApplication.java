@@ -1,4 +1,4 @@
-package py.sqlcli;
+package io.github.rocketk.sqlcli;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

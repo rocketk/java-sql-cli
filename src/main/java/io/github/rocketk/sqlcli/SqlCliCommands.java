@@ -1,7 +1,6 @@
-package py.sqlcli;
+package io.github.rocketk.sqlcli;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.google.gson.Gson;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -150,16 +149,15 @@ public class SqlCliCommands {
     }
 
     private String createJsonString(String[] columnNames, List<String[]> rows) {
-        final int rowCount = rows.size();
-        JSONArray jsonArray = new JSONArray(rowCount);
-        for (String[] row : rows) {
-            JSONObject field = new JSONObject();
+        List<Map<String, String>> list = new ArrayList<>(rows.size());
+        rows.forEach(row -> {
+            final Map<String, String> one = new HashMap<>();
             for (int i = 0; i < row.length; i++) {
-                field.put(columnNames[i], row[i]);
+                one.put(columnNames[i], row[i]);
             }
-            jsonArray.add(field);
-        }
-        return JSONArray.toJSONString(jsonArray, true);
+            list.add(one);
+        });
+        return JsonUtil.marshal(list);
     }
 
     private String createExcelFile(String[] columnNames, List<String[]> rows) {

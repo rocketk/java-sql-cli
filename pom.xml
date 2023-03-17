@@ -5,17 +5,18 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.1.6.RELEASE</version>
+		<version>2.7.9</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>py</groupId>
+	<groupId>io.github.rocketk</groupId>
 	<artifactId>java-sql-cli</artifactId>
-	<version>1.2</version>
+	<version>2.0</version>
 	<name>sql client written in java</name>
 	<description>sql helper</description>
 
 	<properties>
 		<java.version>1.8</java.version>
+		<spring-shell.version>2.1.6</spring-shell.version>
 	</properties>
 
 	<dependencies>
@@ -32,34 +33,49 @@
 		<dependency>
 			<groupId>org.springframework.shell</groupId>
 			<artifactId>spring-shell-starter</artifactId>
-			<version>2.0.1.BUILD-SNAPSHOT</version>
 		</dependency>
 <!--		<dependency>-->
 <!--			<groupId>ojdbc6</groupId>-->
 <!--			<artifactId>ojdbc6</artifactId>-->
 <!--			<version>11.2.0.4.0</version>-->
 <!--		</dependency>-->
+<!--		<dependency>-->
+<!--			<groupId>oracle</groupId>-->
+<!--			<artifactId>ojdbc6</artifactId>-->
+<!--			<version>19.3</version>-->
+<!--		</dependency>-->
 		<dependency>
-			<groupId>oracle</groupId>
-			<artifactId>ojdbc6</artifactId>
-			<version>19.3</version>
+			<groupId>com.oracle.database.jdbc</groupId>
+			<artifactId>ojdbc10</artifactId>
+			<version>19.18.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
-			<version>8.0.13</version>
-		</dependency>
-		<dependency>
-			<groupId>com.alibaba</groupId>
-			<artifactId>fastjson</artifactId>
-			<version>1.2.72</version>
+			<version>8.0.29</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
 			<version>3.17</version>
 		</dependency>
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+		</dependency>
 	</dependencies>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.shell</groupId>
+				<artifactId>spring-shell-dependencies</artifactId>
+				<version>${spring-shell.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
 
 	<repositories>
 		<repository>

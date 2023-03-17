@@ -1,8 +1,8 @@
-package py.sqlcli;
+package io.github.rocketk.sqlcli;
 
 import java.util.Arrays;
 
-import static py.sqlcli.Table.Align.*;
+import static io.github.rocketk.sqlcli.Table.Align.*;
 
 /**
  * @author pengyu
