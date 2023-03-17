@@ -89,6 +89,7 @@
 	</repositories>
 
 	<build>
+		<finalName>java-sql-cli</finalName>
 		<resources>
 			<resource>
 				<filtering>true</filtering>
